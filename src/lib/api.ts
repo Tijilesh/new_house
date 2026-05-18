@@ -2,6 +2,18 @@
 // Set VITE_API_BASE_URL in your env (e.g. http://localhost:8080/api).
 // When empty, the app falls back to local-storage mode (storage.ts).
 
+const isLocalHostname = (host: string): boolean => {
+  if (host === "localhost" || host === "127.0.0.1" || host === "::1" || host === "") return true;
+  if (host.startsWith("192.168.") || host.startsWith("10.")) return true;
+  const parts = host.split(".");
+  if (parts.length === 4) {
+    const first = Number(parts[0]);
+    const second = Number(parts[1]);
+    if (first === 172 && second >= 16 && second <= 31) return true;
+  }
+  return false;
+};
+
 const getApiBase = (): string => {
   let base = (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_API_BASE_URL) || "";
   if (!base) {
@@ -20,7 +32,17 @@ const getApiBase = (): string => {
 
 export const API_BASE: string = getApiBase();
 
-export const apiEnabled = () => Boolean(API_BASE);
+export const apiEnabled = (): boolean => {
+  if (typeof window === "undefined") return false;
+  const host = window.location.hostname;
+  const envUrl = (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_API_BASE_URL) || "";
+  
+  if (envUrl && !envUrl.includes("localhost") && !envUrl.includes("127.0.0.1")) {
+    return true;
+  }
+  
+  return isLocalHostname(host);
+};
 
 const TOKEN_KEY = "bt.api.token";
 
