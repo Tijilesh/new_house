@@ -2,9 +2,23 @@
 // Set VITE_API_BASE_URL in your env (e.g. http://localhost:8080/api).
 // When empty, the app falls back to local-storage mode (storage.ts).
 
-export const API_BASE: string =
-  (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_API_BASE_URL) ||
-  `http://${typeof window !== "undefined" ? window.location.hostname : "localhost"}:8082/api`;
+const getApiBase = (): string => {
+  let base = (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_API_BASE_URL) || "";
+  if (!base) {
+    base = `http://${typeof window !== "undefined" ? window.location.hostname : "localhost"}:8082/api`;
+  }
+  // Cross-device/mobile dynamic replacement:
+  // If the page is accessed via an IP address or custom domain, but the API base is configured
+  // to use localhost/127.0.0.1, we automatically route requests to the hosting machine's hostname.
+  if (typeof window !== "undefined" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+    if (base.includes("localhost") || base.includes("127.0.0.1")) {
+      base = base.replace("localhost", window.location.hostname).replace("127.0.0.1", window.location.hostname);
+    }
+  }
+  return base;
+};
+
+export const API_BASE: string = getApiBase();
 
 export const apiEnabled = () => Boolean(API_BASE);
 

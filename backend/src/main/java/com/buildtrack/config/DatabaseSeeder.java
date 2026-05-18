@@ -35,8 +35,9 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // 1. Seed default user if empty
-        if (userRepository.count() == 0) {
+        // 1. Seed or update default admin user
+        var adminOpt = userRepository.findByUsername(adminUsername);
+        if (adminOpt.isEmpty()) {
             AppUser admin = AppUser.builder()
                     .username(adminUsername)
                     .password(passwordEncoder.encode(adminPassword))
@@ -44,6 +45,11 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .build();
             userRepository.save(admin);
             System.out.println("Seeded default admin user: " + adminUsername);
+        } else {
+            AppUser admin = adminOpt.get();
+            admin.setPassword(passwordEncoder.encode(adminPassword));
+            userRepository.save(admin);
+            System.out.println("Ensured correct password for default admin user: " + adminUsername);
         }
 
         // 2. Seed default categories if empty
