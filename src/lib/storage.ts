@@ -330,7 +330,7 @@ export const deleteWorker = (id: string) => {
 
 export const getCategories = () => {
   if (!apiEnabled()) return read<string[]>(KEYS.categories, DEFAULT_CATEGORIES);
-  return DEFAULT_CATEGORIES;
+  return queryClient.getQueryData<string[]>(["categories"]) ?? DEFAULT_CATEGORIES;
 };
 
 export const setCategoriesList = (v: string[]) => {
@@ -347,7 +347,7 @@ export const setCategoriesList = (v: string[]) => {
 
 export const getWorkStages = () => {
   if (!apiEnabled()) return read<string[]>(KEYS.workStages, DEFAULT_WORK_STAGES);
-  return DEFAULT_WORK_STAGES;
+  return queryClient.getQueryData<string[]>(["workStages"]) ?? DEFAULT_WORK_STAGES;
 };
 
 export const setWorkStages = (v: string[]) => {
@@ -364,7 +364,7 @@ export const setWorkStages = (v: string[]) => {
 
 export const getBudgets = () => {
   if (!apiEnabled()) return read<BudgetItem[]>(KEYS.budgets, DEFAULT_BUDGETS);
-  return DEFAULT_BUDGETS;
+  return queryClient.getQueryData<BudgetItem[]>(["budgets"]) ?? DEFAULT_BUDGETS;
 };
 
 export const setBudgets = (v: BudgetItem[]) => {
@@ -381,7 +381,7 @@ export const setBudgets = (v: BudgetItem[]) => {
 
 export const getSettings = () => {
   if (!apiEnabled()) return read<Settings>(KEYS.settings, DEFAULT_SETTINGS);
-  return DEFAULT_SETTINGS;
+  return queryClient.getQueryData<Settings>(["settings"]) ?? DEFAULT_SETTINGS;
 };
 
 export const setSettings = (v: Settings) => {
